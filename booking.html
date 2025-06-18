@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glamour Salon - Book Your Appointment</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #8e44ad;
+            --secondary-color: #9b59b6;
+            --accent-color: #f1c40f;
+            --light-color: #f9f9f9;
+            --dark-color: #333;
+        }
+        
+        * {
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Arial', sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(30deg);
+        }
+        
+        h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            position: relative;
+        }
+        
+        .booking-form {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .form-section {
+            margin-bottom: 25px;
+        }
+        
+        .form-section h2 {
+            color: var(--primary-color);
+            margin-top: 0;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            position: relative;
+        }
+        
+        .form-section h2::after {
+            content: "";
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background: var(--primary-color);
+        }
+        
+        .service-options, .stylist-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .service-option, .stylist-option {
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .service-option:hover, .stylist-option:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(142, 68, 173, 0.05);
+        }
+        
+        .service-option.selected, .stylist-option.selected {
+            border-color: var(--primary-color);
+            background-color: rgba(142, 68, 173, 0.1);
+        }
+        
+        .service-option h3, .stylist-option h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+        
+        .service-price {
+            font-weight: bold;
+            color: var(--dark-color);
+        }
+        
+        .service-duration {
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
+        .stylist-image {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        
+        .datetime-selector {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .date-picker, .time-slots {
+            flex: 1;
+        }
+        
+        #calendar {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        #calendar th, #calendar td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        
+        #calendar th {
+            background-color: rgba(142, 68, 173, 0.1);
+        }
+        
+        #calendar td {
+            cursor: pointer;
+        }
+        
+        #calendar td:hover {
+            background-color: rgba(142, 68, 173, 0.1);
+        }
+        
+        #calendar td.selected {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        #calendar td.disabled {
+            color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .time-slots-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        
+        .time-slot {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: center;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .time-slot:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(142, 68, 173, 0.05);
+        }
+        
+        .time-slot.selected {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .time-slot.booked {
+            background-color: rgba(142, 68, 173, 0.1);
+            color: #999;
+            cursor: not-allowed;
+        }
+        
+        .customer-info input, .customer-info textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            transition: border-color 0.3s;
+        }
+        
+        .customer-info input:focus, .customer-info textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+        
+        .customer-info label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        button {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 8px rgba(142, 68, 173, 0.3);
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(142, 68, 173, 0.4);
+        }
+        
+        .summary {
+            background-color: rgba(142, 68, 173, 0.1);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+        
+        .summary h2 {
+            margin-top: 0;
+            color: var(--primary-color);
+            position: relative;
+        }
+        
+        .summary h2::after {
+            content: "";
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background: var(--primary-color);
+        }
+        
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .total {
+            font-weight: bold;
+            font-size: 1.2rem;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+        
+        .confirmation {
+            text-align: center;
+            padding: 40px;
+            display: none;
+        }
+        
+        .confirmation h2 {
+            color: var(--primary-color);
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .confirmation p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .datetime-selector {
+                flex-direction: column;
+            }
+            
+            .service-options, .stylist-options {
+                grid-template-columns: 1fr;
+            }
+            
+            .time-slots-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Glamour & Elegance Hairstyles</h1>
+            <p>Book your beauty appointment online</p>
+        </header>
+        
+        <div class="booking-form" id="bookingForm">
+            <div class="form-section">
+                <h2>1. Select Services</h2>
+                <div class="service-options">
+                    <div class="service-option" data-service="haircut" data-price="45" data-duration="45">
+                        <h3>Haircut</h3>
+                        <p>A fresh cut to suit your style</p>
+                        <span class="service-price">$45</span>
+                        <span class="service-duration">45 min</span>
+                    </div>
+                    <div class="service-option" data-service="color" data-price="85" data-duration="90">
+                        <h3>Hair Color</h3>
+                        <p>Full color service with conditioning</p>
+                        <span class="service-price">$85</span>
+                        <span class="service-duration">90 min</span>
+                    </div>
+                    <div class="service-option" data-service="highlights" data-price="120" data-duration="120">
+                        <h3>Highlights</h3>
+                        <p>Partial or full highlights</p>
+                        <span class="service-price">$120</span>
+                        <span class="service-duration">2 hours</span>
+                    </div>
+                    <div class="service-option" data-service="style" data-price="35" data-duration="30">
+                        <h3>Blowout & Style</h3>
+                        <p>Wash and professional styling</p>
+                        <span class="service-price">$35</span>
+                        <span class="service-duration">30 min</span>
+                    </div>
+                    <div class="service-option" data-service="manicure" data-price="25" data-duration="30">
+                        <h3>Manicure</h3>
+                        <p>Classic or gel polish</p>
+                        <span class="service-price">$25</span>
+                        <span class="service-duration">30 min</span>
+                    </div>
+                    <div class="service-option" data-service="pedicure" data-price="40" data-duration="45">
+                        <h3>Pedicure</h3>
+                        <p>Spa pedicure with massage</p>
+                        <span class="service-price">$40</span>
+                        <span class="service-duration">45 min</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h2>2. Choose Your Stylist</h2>
+                <div class="stylist-options">
+                    <div class="stylist-option" data-stylist="sarah">
+                        <img src="6.jpg" alt="Sarah" class="stylist-image">
+                        <h3>Sarah</h3>
+                        <p>Hair Specialist</p>
+                    </div>
+                    <div class="stylist-option" data-stylist="michael">
+                        <img src="6.jpg" alt="Michael" class="stylist-image">
+                        <h3>Michael</h3>
+                        <p>Color Expert</p>
+                    </div>
+                    <div class="stylist-option" data-stylist="jessica">
+                        <img src="6.jpg" alt="Jessica" class="stylist-image">
+                        <h3>Jessica</h3>
+                        <p>Nail Technician</p>
+                    </div>
+                    <div class="stylist-option" data-stylist="no-preference">
+                        <img src="6.jpg" alt="No Preference" class="stylist-image">
+                        <h3>No Preference</h3>
+                        <p>Any Available Stylist</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h2>3. Select Date & Time</h2>
+                <div class="datetime-selector">
+                    <div class="date-picker">
+                        <h3>Select Date</h3>
+                        <table id="calendar">
+                            <thead>
+                                <tr>
+                                    <th>Sun</th>
+                                    <th>Mon</th>
+                                    <th>Tue</th>
+                                    <th>Wed</th>
+                                    <th>Thu</th>
+                                    <th>Fri</th>
+                                    <th>Sat</th>
+                                </tr>
+                            </thead>
+                            <tbody id="calendar-body">
+                                <!-- Calendar will be generated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="time-slots">
+                        <h3>Available Times</h3>
+                        <div class="time-slots-container" id="timeSlots">
+                            <!-- Time slots will be generated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-section customer-info">
+                <h2>4. Your Information</h2>
+                <label for="name">Full Name</label>
+                <input type="text" id="name" required>
+                
+                <label for="email">Email</label>
+                <input type="email" id="email" required>
+                
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" required>
+                
+                <label for="notes">Special Requests (optional)</label>
+                <textarea id="notes" rows="3"></textarea>
+            </div>
+            
+            <div class="summary">
+                <h2>Booking Summary</h2>
+                <div class="summary-item">
+                    <span>Service:</span>
+                    <span id="summary-service">Not selected</span>
+                </div>
+                <div class="summary-item">
+                    <span>Stylist:</span>
+                    <span id="summary-stylist">Not selected</span>
+                </div>
+                <div class="summary-item">
+                    <span>Date & Time:</span>
+                    <span id="summary-datetime">Not selected</span>
+                </div>
+                <div class="summary-item total">
+                    <span>Total:</span>
+                    <span id="summary-total">$0</span>
+                </div>
+            </div>
+            
+            <button id="submitBooking">Book Appointment</button>
+        </div>
+        
+        <div class="confirmation" id="confirmation">
+            <h2>Thank You For Your Booking!</h2>
+            <p>Your appointment has been confirmed. We've sent the details to your email.</p>
+            <p>We look forward to seeing you at the salon!</p>
+            <button id="newBooking">Make Another Booking</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Selected booking details
+            let bookingDetails = {
+                service: null,
+                stylist: null,
+                date: null,
+                time: null,
+                price: 0
+            };
+            
+            // Generate calendar
+            generateCalendar();
+            
+            // Service selection
+            const serviceOptions = document.querySelectorAll('.service-option');
+            serviceOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    serviceOptions.forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    
+                    bookingDetails.service = this.getAttribute('data-service');
+                    bookingDetails.price = parseFloat(this.getAttribute('data-price'));
+                    
+                    document.getElementById('summary-service').textContent = 
+                        this.querySelector('h3').textContent + ' ($' + bookingDetails.price + ')';
+                    document.getElementById('summary-total').textContent = '$' + bookingDetails.price;
+                    
+                    // Update available time slots when service changes
+                    if (bookingDetails.date) {
+                        generateTimeSlots();
+                    }
+                });
+            });
+            
+            // Stylist selection
+            const stylistOptions = document.querySelectorAll('.stylist-option');
+            stylistOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    stylistOptions.forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    
+                    bookingDetails.stylist = this.getAttribute('data-stylist');
+                    document.getElementById('summary-stylist').textContent = this.querySelector('h3').textContent;
+                });
+            });
+            
+            // Date selection
+            function generateCalendar() {
+                const calendarBody = document.getElementById('calendar-body');
+                calendarBody.innerHTML = '';
+                
+                const today = new Date();
+                const currentMonth = today.getMonth();
+                const currentYear = today.getFullYear();
+                const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+                const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
+                
+                let date = 1;
+                for (let i = 0; i < 6; i++) {
+                    if (date > daysInMonth) break;
+                    
+                    const row = document.createElement('tr');
+                    
+                    for (let j = 0; j < 7; j++) {
+                        const cell = document.createElement('td');
+                        
+                        if (i === 0 && j < firstDayOfMonth) {
+                            // Empty cells before the first day of the month
+                            cell.textContent = '';
+                            cell.classList.add('disabled');
+                        } else if (date > daysInMonth) {
+                            // Empty cells after the last day of the month
+                            cell.textContent = '';
+                            cell.classList.add('disabled');
+                        } else {
+                            // Cells with dates
+                            cell.textContent = date;
+                            
+                            // Disable past dates
+                            if (date < today.getDate() && currentMonth === today.getMonth()) {
+                                cell.classList.add('disabled');
+                            } else {
+                                cell.addEventListener('click', function() {
+                                    const selectedDate = document.querySelector('#calendar td.selected');
+                                    if (selectedDate) {
+                                        selectedDate.classList.remove('selected');
+                                    }
+                                    this.classList.add('selected');
+                                    
+                                    // Store selected date
+                                    const selectedDay = this.textContent;
+                                    bookingDetails.date = new Date(currentYear, currentMonth, selectedDay);
+                                    
+                                    // Update summary
+                                    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                                    document.getElementById('summary-datetime').textContent = 
+                                        bookingDetails.date.toLocaleDateString('en-US', options) + 
+                                        (bookingDetails.time ? ' at ' + bookingDetails.time : '');
+                                    
+                                    // Generate time slots for selected date
+                                    generateTimeSlots();
+                                });
+                            }
+                            
+                            date++;
+                        }
+                        
+                        row.appendChild(cell);
+                    }
+                    
+                    calendarBody.appendChild(row);
+                }
+            }
+            
+            // Time slot selection
+            function generateTimeSlots() {
+                const timeSlotsContainer = document.getElementById('timeSlots');
+                timeSlotsContainer.innerHTML = '';
+                
+                if (!bookingDetails.date) return;
+                
+                // Generate time slots based on service duration
+                let startHour = 9; // Salon opens at 9am
+                let endHour = 17;  // Salon closes at 5pm
+                
+                // Get service duration (default to 30 min if no service selected)
+                let duration = 30;
+                const selectedService = document.querySelector('.service-option.selected');
+                if (selectedService) {
+                    duration = parseInt(selectedService.getAttribute('data-duration'));
+                }
+                
+                // Generate slots
+                for (let hour = startHour; hour < endHour; hour++) {
+                    for (let minute = 0; minute < 60; minute += 30) {
+                        // Skip times that would go past closing
+                        if (hour === endHour - 1 && minute + duration > 60) {
+                            continue;
+                        }
+                        
+                        const timeString = `${hour > 12 ? hour - 12 : hour}:${minute === 0 ? '00' : minute} ${hour >= 12 ? 'PM' : 'AM'}`;
+                        
+                        const slot = document.createElement('div');
+                        slot.className = 'time-slot';
+                        slot.textContent = timeString;
+                        
+                        // Randomly mark some slots as booked for demo purposes
+                        if (Math.random() < 0.3) {
+                            slot.classList.add('booked');
+                        } else {
+                            slot.addEventListener('click', function() {
+                                const selectedSlot = document.querySelector('.time-slot.selected');
+                                if (selectedSlot) {
+                                    selectedSlot.classList.remove('selected');
+                                }
+                                this.classList.add('selected');
+                                
+                                bookingDetails.time = timeString;
+                                document.getElementById('summary-datetime').textContent = 
+                                    bookingDetails.date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + 
+                                    ' at ' + bookingDetails.time;
+                            });
+                        }
+                        
+                        timeSlotsContainer.appendChild(slot);
+                    }
+                }
+            }
+            
+            // Form submission
+            document.getElementById('submitBooking').addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Validate form
+                if (!bookingDetails.service) {
+                    alert('Please select a service');
+                    return;
+                }
+                
+                if (!bookingDetails.stylist) {
+                    alert('Please select a stylist');
+                    return;
+                }
+                
+                if (!bookingDetails.date || !bookingDetails.time) {
+                    alert('Please select a date and time');
+                    return;
+                }
+                
+                const name = document.getElementById('name').value;
+                const email = document.getElementById('email').value;
+                const phone = document.getElementById('phone').value;
+                
+                if (!name || !email || !phone) {
+                    alert('Please fill in all required customer information');
+                    return;
+                }
+                
+                // In a real app, you would send this data to your server
+                console.log('Booking submitted:', {
+                    ...bookingDetails,
+                    customer: { name, email, phone },
+                    notes: document.getElementById('notes').value
+                });
+                
+                // Show confirmation
+                document.getElementById('bookingForm').style.display = 'none';
+                document.getElementById('confirmation').style.display = 'block';
+            });
+            
+            // New booking button
+            document.getElementById('newBooking').addEventListener('click', function() {
+                // Reset form
+                document.getElementById('bookingForm').style.display = 'block';
+                document.getElementById('confirmation').style.display = 'none';
+                
+                // Clear selections
+                serviceOptions.forEach(opt => opt.classList.remove('selected'));
+                stylistOptions.forEach(opt => opt.classList.remove('selected'));
+                document.querySelectorAll('#calendar td.selected, .time-slot.selected').forEach(el => {
+                    el.classList.remove('selected');
+                });
+                
+                // Clear customer info
+                document.getElementById('name').value = '';
+                document.getElementById('email').value = '';
+                document.getElementById('phone').value = '';
+                document.getElementById('notes').value = '';
+                
+                // Reset summary
+                document.getElementById('summary-service').textContent = 'Not selected';
+                document.getElementById('summary-stylist').textContent = 'Not selected';
+                document.getElementById('summary-datetime').textContent = 'Not selected';
+                document.getElementById('summary-total').textContent = '$0';
+                
+                // Reset booking details
+                bookingDetails = {
+                    service: null,
+                    stylist: null,
+                    date: null,
+                    time: null,
+                    price: 0
+                };
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glamour Hair Styles - Beauty Salon & Spa</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #8e44ad;
+            --secondary-color: #9b59b6;
+            --accent-color: #f1c40f;
+            --light-color: #f9f9f9;
+            --dark-color: #333;
+        }
+        
+        body {
+            font-family: 'Poppins', 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            color: var(--dark-color);
+            background-color: var(--light-color);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(30deg);
+        }
+        
+        h1 {
+            margin: 0;
+            font-size: 2.2rem;
+            font-weight: 700;
+            position: relative;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+        }
+        
+        .tagline {
+            font-style: italic;
+            margin-top: 0.5rem;
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        
+        .container {
+            display: flex;
+            flex: 1;
+            flex-direction: column;
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        #map {
+            flex: 1;
+            height: 60vh;
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin: 1rem;
+            border: 1px solid #ddd;
+        }
+        
+        .info-panel {
+            padding: 1.5rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .info-panel::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: url('https://cdn-icons-png.flaticon.com/512/2966/2966788.png') no-repeat;
+            background-size: contain;
+            opacity: 0.1;
+            z-index: 0;
+        }
+        
+        .salon-info {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .address {
+            font-weight: bold;
+            margin: 0.8rem 0;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .contact {
+            margin: 0.8rem 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .icon {
+            color: var(--primary-color);
+        }
+        
+        .service-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+            margin: 1rem 0;
+        }
+        
+        .service-item {
+            background-color: rgba(142, 68, 173, 0.1);
+            padding: 10px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .service-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            background-color: rgba(142, 68, 173, 0.2);
+        }
+        
+        .hours-grid {
+            display: grid;
+            grid-template-columns: auto auto;
+            gap: 10px;
+            margin: 1rem 0;
+        }
+        
+        .day {
+            font-weight: bold;
+        }
+        
+        .time {
+            text-align: right;
+        }
+        
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 1rem 0;
+        }
+        
+        .gallery img {
+            width: 100%;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 6px;
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+        
+        .gallery img:hover {
+            transform: scale(1.05);
+        }
+        
+        .booking-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 1rem;
+            display: inline-block;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 8px rgba(142, 68, 173, 0.3);
+        }
+        
+        .booking-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(142, 68, 173, 0.4);
+        }
+        
+        footer {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+            font-size: 0.9rem;
+            margin-top: auto;
+        }
+        
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 1rem 0;
+        }
+        
+        .social-icon {
+            color: white;
+            font-size: 1.5rem;
+            transition: transform 0.3s;
+        }
+        
+        .social-icon:hover {
+            transform: translateY(-3px) scale(1.1);
+        }
+        
+        @media (min-width: 768px) {
+            .container {
+                flex-direction: row;
+                padding: 1rem;
+            }
+            
+            #map {
+                height: 85vh;
+                width: 60%;
+                margin: 0;
+            }
+            
+            .info-panel {
+                width: 40%;
+                height: 85vh;
+                overflow-y: auto;
+                margin: 0;
+            }
+            
+            .gallery img {
+                height: 100px;
+            }
+        }
+        
+        /* Custom marker popup style */
+        .leaflet-popup-content {
+            text-align: center;
+            padding: 15px;
+        }
+        
+        .leaflet-popup-content a {
+            color: var(--primary-color);
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 10px;
+            padding: 5px 10px;
+            border-radius: 4px;
+            background-color: rgba(142, 68, 173, 0.1);
+            transition: background-color 0.3s;
+        }
+        
+        .leaflet-popup-content a:hover {
+            text-decoration: none;
+            background-color: rgba(142, 68, 173, 0.2);
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--secondary-color);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-color);
+        }
+        
+        /* Floating action button */
+        .fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: var(--primary-color);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 1000;
+            cursor: pointer;
+            transition: transform 0.3s, background-color 0.3s;
+        }
+        
+        .fab:hover {
+            transform: scale(1.1);
+            background-color: var(--secondary-color);
+        }
+        
+        /* Testimonials */
+        .testimonials {
+            margin: 1.5rem 0;
+        }
+        
+        .testimonial {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .testimonial-text {
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+        
+        .testimonial-author {
+            font-weight: bold;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .rating {
+            color: var(--accent-color);
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Glamour & Elegance Hairstyles</h1>
+        <div class="tagline">we style, you smile</div>
+    </header>
+    
+    <div class="container">
+        <div id="map"></div>
+        <div class="info-panel">
+            <div class="salon-info">
+                <h2><i class="fas fa-scissors icon"></i> Glamour Hair Styles</h2>
+                <p class="address"><i class="fas fa-map-marker-alt icon"></i> Masaka road off kazinga road opp SDA church, Kampala, Uganda</p>
+                <p class="contact"><i class="fas fa-phone-alt icon"></i> Phone: +256 781 028 895</p>
+                <p>Glamour is a premium beauty salon owned by Johaks Parix, providing exceptional beauty services to the community with a touch of elegance and sophistication.</p>
+                
+                <h3><i class="fas fa-spa icon"></i> Our Services</h3>
+                <div class="service-list">
+                    <div class="service-item">
+                        <i class="fas fa-cut icon"></i> Hair Cutting
+                    </div>
+                    <div class="service-item">
+                        <i class="fas fa-spa icon"></i> Facial Scrubbing
+                    </div>
+                    <div class="service-item">
+                        <i class="fas fa-mask icon"></i> Black Masking
+                    </div>
+                    <div class="service-item">
+                        <i class="fas fa-paint-brush icon"></i> Hair Tinting
+                    </div>
+                    <div class="service-item">
+                        <i class="fas fa-hands icon"></i> Body Massage
+                    </div>
+                    <div class="service-item">
+                        <i class="fas fa-fire icon"></i> Hair Styling
+                    </div>
+                    <div class="service-item">
+                        <i class="fas fa-palette icon"></i> Hair Coloring
+                    </div>
+                    <div class="service-item">
+                        <i class="fas fa-eye icon"></i> Eyebrow Shaping
+                    </div>
+                </div>
+                
+                <h3><i class="far fa-clock icon"></i> Business Hours</h3>
+                <div class="hours-grid">
+                    <div class="day">Monday - Friday</div>
+                    <div class="time">8:00 AM - 7:00 PM</div>
+                    <div class="day">Saturday</div>
+                    <div class="time">9:00 AM - 11:00 PM</div>
+                    <div class="day">Sunday</div>
+                    <div class="time">9:00 AM - 11:40 PM</div>
+                </div>
+                
+                <h3><i class="fas fa-images icon"></i> Our Gallery</h3>
+                <div class="gallery">
+                    <img src="1.jpg" alt="Salon Interior">
+                    <img src="2.jpg" alt="Hair Styling">
+                    <img src="3.jpg" alt="Beauty Treatment">
+                    <img src="4.jpg" alt="Hair Coloring">
+                    <img src="5.jpg" alt="Facial Treatment">
+                </div>
+                
+                <h3><i class="fas fa-star icon"></i> Testimonials</h3>
+                <div class="testimonials">
+                    <div class="testimonial">
+                        <div class="rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <p class="testimonial-text">"The best salon in Kampala! Johaks gave me exactly the look I wanted. The staff is professional and the atmosphere is so relaxing."</p>
+                        <p class="testimonial-author"><i class="fas fa-user"></i> Sarah K.</p>
+                    </div>
+                    <div class="testimonial">
+                        <div class="rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <p class="testimonial-text">"I've been coming here for years. The facial treatments are amazing and leave my skin glowing every time."</p>
+                        <p class="testimonial-author"><i class="fas fa-user"></i> Miriam N.</p>
+                    </div>
+                </div>
+                
+                <button class="booking-btn">
+                    <i class="fas fa-calendar-check"></i> Book an Appointment
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <a href="tel:+256781028895" class="fab">
+        <i class="fas fa-phone"></i>
+    </a>
+    
+    <footer>
+        <div class="social-icons">
+            <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="social-icon"><i class="fab fa-whatsapp"></i></a>
+            <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+        </div>
+        <p>&copy; 2025 Glamour & Elegance Hairstyles | All Rights Reserved</p>
+        <p>Map data &copy; OpenStreetMap contributors</p>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Initialize the map centered on Glamour Hair Styles coordinates
+        const map = L.map('map').setView([0.2806847, 32.5021477], 18);
+        
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        
+        // Custom beauty salon icon
+        const salonIcon = L.icon({
+            iconUrl: 'https://cdn-icons-png.flaticon.com/512/2966/2966788.png',
+            iconSize: [50, 50],
+            iconAnchor: [25, 50],
+            popupAnchor: [0, -50]
+        });
+        
+        // Add marker for Glamour Hair Styles
+        const marker = L.marker([0.2806847, 32.5021477], {
+            icon: salonIcon,
+            title: "Glamour and Elegance Hairstyles"
+        }).addTo(map);
+        
+        // Add popup with salon information
+        marker.bindPopup(`
+            <div style="text-align: center;">
+                <h3 style="margin: 0 0 10px 0; color: #8e44ad;">Glamour & Elegance Hairstyles</h3>
+                <p style="margin: 5px 0;">Masaka road off kazinga road</p>
+                <p style="margin: 5px 0;"><i class="fas fa-phone" style="color: #8e44ad;"></i> +256 781 028 895</p>
+                <a href="https://www.google.com/maps/place//@0.2806969,32.5020368,21z/data=!4m6!1m5!3m4!2zMMKwMTYnNTAuNSJOIDMywrAzMCcwNy43IkU!8m2!3d0.2806847!4d32.5021477?hl=en&entry=ttu&g_ep=EgoyMDI1MDYxNS4wIKXMDSoASAFQAw%3D%3D" 
+                   target="_blank" style="display: inline-block; margin-top: 10px; padding: 5px 10px; border-radius: 4px; background-color: rgba(142, 68, 173, 0.1); color: #8e44ad; text-decoration: none; transition: background-color 0.3s;">
+                    <i class="fas fa-directions"></i> Get Directions
+                </a>
+            </div>
+        `).openPopup();
+        
+        // Add a circle to highlight the salon area
+        L.circle([0.2806847, 32.5021477], {
+            color: '#8e44ad',
+            fillColor: '#8e44ad',
+            fillOpacity: 0.2,
+            radius: 30
+        }).addTo(map);
+        
+        // Add scale control
+        L.control.scale().addTo(map);
+        
+        // Function to handle geolocation
+        function onLocationFound(e) {
+            const radius = e.accuracy / 2;
+            
+            L.marker(e.latlng).addTo(map)
+                .bindPopup(`You are within ${Math.round(radius)} meters of this point`).openPopup();
+            
+            L.circle(e.latlng, radius).addTo(map);
+        }
+        
+        function onLocationError(e) {
+            alert("Unable to determine your location: " + e.message);
+        }
+        
+        // Add locate control
+        map.on('locationfound', onLocationFound);
+        map.on('locationerror', onLocationError);
+        
+        // Add button to locate user
+        L.control.locate({
+            position: 'topright',
+            drawCircle: true,
+            showPopup: true,
+            locateOptions: {
+                maxZoom: 18
+            },
+            icon: 'fas fa-location-arrow',
+            metric: true,
+            strings: {
+                title: "Show my location"
+            }
+        }).addTo(map);
+        
+        // Add custom button for booking
+        const bookingControl = L.control({position: 'topright'});
+        
+        bookingControl.onAdd = function(map) {
+            const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+            div.innerHTML = '<a href="#" title="Book Appointment" style="background-color: #8e44ad; color: white; display: flex; justify-content: center; align-items: center; width: 30px; height: 30px;"><i class="fas fa-calendar-check"></i></a>';
+            div.firstChild.onclick = function() {
+                alert("Booking functionality would go here!");
+                return false;
+            };
+            return div;
+        };
+        
+        bookingControl.addTo(map);
+        
+        // Add image to popup
+        const imageElement = document.createElement('img');
+        imageElement.src = '1.jpg'; // Using 1.jpg for the popup image
+        imageElement.style.width = '100px';
+        imageElement.style.margin = '5px auto';
+        imageElement.style.display = 'block';
+        imageElement.style.borderRadius = '4px';
+        
+        // Add image to popup content
+        marker.getPopup().setContent(marker.getPopup().getContent() + imageElement.outerHTML);
+    </script>
+</body>
+</html>
